@@ -7,8 +7,11 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 /**
+ * @UniqueEntity("name")
  * @ORM\Entity(repositoryClass="App\Repository\FootballLeagueRepository")
  * @ORM\Table(name="football_league")
  */
@@ -52,6 +55,14 @@ class FootballLeague
     {
         // php-array on steroids
         $this->teams = new ArrayCollection();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

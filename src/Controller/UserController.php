@@ -8,13 +8,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class UserController extends Controller
 {
-    public function getUser($email)
-    {
-
-    }
-
-    public function createUser()
-    {
-
-    }
+//    public function getUser($email)
+//    {
+//
+//    }
+//
+//    public function createUser()
+//    {
+//
+//    }
 }

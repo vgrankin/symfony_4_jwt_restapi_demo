@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/
@@ -23,3 +22,4 @@ yarn-error.log
 ###< symfony/web-server-bundle ###
 
 .idea
+phpunit.xml
