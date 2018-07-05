@@ -34,12 +34,8 @@ class FootballTeamController extends Controller
      */
     public function getTeams(FootballLeague $league)
     {
-        dump($league);
-        die();
-
-        $em = $this->getDoctrine()->getManager();
-        $teams = $em->getRepository("App:FootballTeam")
-            ->getTeamsByLeague($leagueId);
+        $teams = $league->getTeams();
+        var_dump($teams);
 
         $data = [
             'teams' => $teams

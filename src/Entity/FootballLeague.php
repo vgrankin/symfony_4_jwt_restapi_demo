@@ -4,6 +4,7 @@
 namespace App\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -15,6 +16,7 @@ class FootballLeague
 {
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\FootballTeam", mappedBy="league")
+     * @ORM\OrderBy({"name"="ASC"})
      */
     private $teams;
 
@@ -46,5 +48,19 @@ class FootballLeague
         $this->name = $name;
     }
 
+    public function __construct()
+    {
+        // php-array on steroids
+        $this->teams = new ArrayCollection();
+    }
 
+    /**
+     * Get list of teams for this league
+     *
+     * @return ArrayCollection|FootballTeam[]
+     */
+    public function getTeams()
+    {
+        return $this->teams;
+    }
 }
