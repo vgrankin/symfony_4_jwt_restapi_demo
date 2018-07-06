@@ -7,6 +7,7 @@ use App\Service\ResponseErrorDecoratorService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -50,17 +51,25 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         $response = new JsonResponse();
 
+        $message = null;
+
+
         // HttpExceptionInterface is a special type of exception that
         // holds status code and header details
         if ($exception instanceof HttpExceptionInterface) {
             $status = $exception->getStatusCode();
             $response->headers->replace($exception->getHeaders());
+            if ($exception instanceof AccessDeniedHttpException) {
+                $message = $exception->getMessage();
+            }
         } else {
             $status = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        $message = isset(JsonResponse::$statusTexts[$status])
-            ? JsonResponse::$statusTexts[$status] : "Unknown error";
+        if (!$message) {
+            $message = isset(JsonResponse::$statusTexts[$status])
+                ? JsonResponse::$statusTexts[$status] : "Unknown error";
+        }
 
         $data = $this->errorDecorator->decorateError($status, $message);
 

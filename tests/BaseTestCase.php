@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class BaseTestCase extends KernelTestCase
 {
@@ -36,17 +37,31 @@ class BaseTestCase extends KernelTestCase
 
     protected function createTestUser($email, $password)
     {
-        // create user
-        $user = new User();
-        $user->setEmail($email);
-        $user->setPassword($password);
-        $this->em->persist($user);
-        $this->em->flush();
+        $container = $this->getPrivateContainer();
+        $userService = $container
+            ->get('App\Service\UserService');
 
-        return $user;
+        return $userService->createUser([
+            'email' => $email,
+            'password' => $password
+        ]);
     }
 
-    protected function tearDown() {
+    private function getPrivateContainer()
+    {
+        self::bootKernel();
+
+        // returns the real and unchanged service container
+        $container = self::$kernel->getContainer();
+
+        // gets the special container that allows fetching private services
+        $container = self::$container;
+
+        return $container;
+    }
+
+    protected function tearDown()
+    {
 
         parent::tearDown();
 

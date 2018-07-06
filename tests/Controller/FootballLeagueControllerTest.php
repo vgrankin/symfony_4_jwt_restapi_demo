@@ -14,8 +14,12 @@ class FootballLeagueControllerTest extends BaseTestCase
             "name" => $leagueName
         ];
 
+        $token = "INVALID";
         $response = $this->client->post("leagues", [
-            'body' => json_encode($data)
+            'body' => json_encode($data),
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
         ]);
 
         $this->assertEquals(201, $response->getStatusCode());

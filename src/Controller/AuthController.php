@@ -5,6 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\User;
+use App\Service\AuthService;
 use App\Service\ResponseErrorDecoratorService;
 use App\Service\UserService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -19,7 +20,7 @@ class AuthController
      * Authenticate user by given credentials
      *
      * @Route("/api/authenticate")
-     * @Method("POST")
+     * @Method("GET")
      * @param Request $request
      * @param UserService $userService
      * @param ResponseErrorDecoratorService $errorDecorator
@@ -28,18 +29,31 @@ class AuthController
     public function issueJWTToken(
         Request $request,
         UserService $userService,
+        AuthService $authService,
         ResponseErrorDecoratorService $errorDecorator
     )
     {
-        $email = $request->getUser();
+//        $email = $request->getUser();
+//        $plainPassword = $request->getPassword();
+        $email = "rest@jwtrestapi.com";
+        $plainPassword = "test123";
+
         $result = $userService->getUser($email);
         if ($result instanceof User) {
-            $status = JsonResponse::HTTP_OK;
-            $data = [
-                'data' => [
-                    'token' => 'TOKEN'
-                ]
-            ];
+            if (password_verify($plainPassword, $result->getPassword())) {
+                $jwt = $authService->authenticate([
+                    'email' => $result->getEmail()
+                ]);
+                $status = JsonResponse::HTTP_OK;
+                $data = [
+                    'data' => [
+                        'token' => $jwt
+                    ]
+                ];
+            } else {
+                $status = JsonResponse::HTTP_BAD_REQUEST;
+                $data = $errorDecorator->decorateError($status, $result);
+            }
         } else {
             $status = JsonResponse::HTTP_BAD_REQUEST;
             $data = $errorDecorator->decorateError($status, $result);

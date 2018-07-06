@@ -10,12 +10,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Controller\TokenAuthenticatedController;
 
 /**
  * Class FootballLeagueController
  * @package App\Controller
  */
-class FootballLeagueController extends Controller
+class FootballLeagueController extends Controller implements TokenAuthenticatedController
 {
     /**
      * @Route("/api/do")
@@ -23,8 +24,6 @@ class FootballLeagueController extends Controller
      */
     public function doAction__TOREMOVE__(FootballLeagueService $leagueService, ResponseErrorDecoratorService $responseDecorator)
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-
         $data = ['name' => 'League 1'];
         throw new Exception('Nooooooooooooooo!');
 
