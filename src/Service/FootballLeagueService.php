@@ -5,10 +5,7 @@ namespace App\Service;
 
 
 use App\Entity\FootballLeague;
-use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Util\Json;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class FootballLeagueService
 {

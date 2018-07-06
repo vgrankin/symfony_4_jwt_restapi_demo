@@ -23,6 +23,8 @@ class FootballLeagueController extends Controller
      */
     public function doAction__TOREMOVE__(FootballLeagueService $leagueService, ResponseErrorDecoratorService $responseDecorator)
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         $data = ['name' => 'League 1'];
         throw new Exception('Nooooooooooooooo!');
 
@@ -50,13 +52,13 @@ class FootballLeagueController extends Controller
      * @Method("POST")
      * @param Request $request
      * @param FootballLeagueService $leagueService
-     * @param ResponseErrorDecoratorService $responseDecorator
+     * @param ResponseErrorDecoratorService $errorDecorator
      * @return JsonResponse
      */
     public function newLeague(
         Request $request,
         FootballLeagueService $leagueService,
-        ResponseErrorDecoratorService $responseDecorator
+        ResponseErrorDecoratorService $errorDecorator
     )
     {
         $body = $request->getContent();
@@ -64,7 +66,7 @@ class FootballLeagueController extends Controller
 
         if (is_null($data) || !isset($data['name'])) {
             $status = JsonResponse::HTTP_BAD_REQUEST;
-            $data = $responseDecorator->decorateError(
+            $data = $errorDecorator->decorateError(
                 JsonResponse::HTTP_BAD_REQUEST, "Invalid JSON format"
             );
 
@@ -82,7 +84,7 @@ class FootballLeagueController extends Controller
             ];
         } else {
             $status = JsonResponse::HTTP_BAD_REQUEST;
-            $data = $responseDecorator->decorateError($status, $result);
+            $data = $errorDecorator->decorateError($status, $result);
         }
 
         return new JsonResponse($data, $status);

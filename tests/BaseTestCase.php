@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use App\Entity\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,7 @@ class BaseTestCase extends KernelTestCase
     /**
      * @var \Doctrine\ORM\EntityManager
      */
-    private $entityManager;
+    protected $em;
 
     public function setUp()
     {
@@ -28,9 +29,21 @@ class BaseTestCase extends KernelTestCase
 
         $kernel = self::bootKernel();
 
-        $this->entityManager = $kernel->getContainer()
+        $this->em = $kernel->getContainer()
             ->get('doctrine')
             ->getManager();
+    }
+
+    protected function createTestUser($email, $password)
+    {
+        // create user
+        $user = new User();
+        $user->setEmail($email);
+        $user->setPassword($password);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
     }
 
     protected function tearDown() {
@@ -38,20 +51,20 @@ class BaseTestCase extends KernelTestCase
         parent::tearDown();
 
 
-        $em = $this->entityManager;
+        $em = $this->em;
 
         $query = $em->createQuery('DELETE App:FootballTeam ft WHERE 1 = 1');
         $query->execute();
 
-        $query = $em->createQuery('DELETE App:FootballLeague ft WHERE 1 = 1');
+        $query = $em->createQuery('DELETE App:FootballLeague fl WHERE 1 = 1');
         $query->execute();
 
-//        $query = $em->createQuery('DELETE App:User ft WHERE 1 = 1');
-//        $query->execute();
+        $query = $em->createQuery('DELETE App:User u WHERE 1 = 1');
+        $query->execute();
 
         parent::tearDown();
 
-        $this->entityManager->close();
-        $this->entityManager = null; // avoid memory leaks
+        $this->em->close();
+        $this->em = null; // avoid memory leaks
     }
 }
