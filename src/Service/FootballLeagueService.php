@@ -5,35 +5,45 @@ namespace App\Service;
 
 
 use App\Entity\FootballLeague;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class FootballLeagueService
 {
-    private $_em;
+    private $em;
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->_em = $em;
+        $this->em = $em;
     }
 
+    /**
+     * Create league by given data
+     *
+     * @param $data Array which contains information about league
+     * @return FootballLeague|string FootballLeague or error message
+     */
     public function createLeague($data)
     {
         $leagueName = $data['name'];
+        if (empty($leagueName)) {
+            return "League name must not be empty!";
+        }
 
-        $league = $this->_em->getRepository("App:FootballLeague")
-            ->findOneBy(['name' => $leagueName]);
-
-        if ($league == null) {
-
+        try {
             $league = new FootballLeague();
             $league->setName($leagueName);
 
-            $this->_em->persist($league);
-            $this->_em->flush();
+            $this->em->persist($league);
+            $this->em->flush();
 
             return $league;
-        } else {
-            return false;
+        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $ex) {
+            return "League with given name already exists.";
+        } catch (\Exception $ex) {
+            return "Unable to create league.";
         }
     }
 }

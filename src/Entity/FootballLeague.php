@@ -31,7 +31,7 @@ class FootballLeague
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=191, unique=true)
      */
     private $name;
 

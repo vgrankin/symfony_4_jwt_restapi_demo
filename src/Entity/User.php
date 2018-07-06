@@ -14,7 +14,7 @@ class User
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, length=191)
      */
     private $email;
 

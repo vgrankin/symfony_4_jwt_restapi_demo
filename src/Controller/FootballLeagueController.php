@@ -9,7 +9,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
@@ -22,23 +21,23 @@ class FootballLeagueController extends Controller
      * @Route("/api/do")
      * @Method("GET")
      */
-    public function doAction(FootballLeagueService $leagueService, ResponseErrorDecoratorService $responseDecorator)
+    public function doAction__TOREMOVE__(FootballLeagueService $leagueService, ResponseErrorDecoratorService $responseDecorator)
     {
         $data = ['name' => 'League 1'];
+        throw new Exception('Nooooooooooooooo!');
 
-        $league = $leagueService->createLeague($data);
-
-        if ($league) {
-            $status = 201;
+        $result = $leagueService->createLeague($data);
+        if ($result instanceof FootballLeague) {
+            $status = JsonResponse::HTTP_CREATED;
             $data = [
                 'data' => [
-                    'id' => $league->getId(),
-                    'name' => $league->getName()
+                    'id' => $result->getId(),
+                    'name' => $result->getName()
                 ]
             ];
         } else {
-            $status = 400;
-            $data = $responseDecorator->decorateError($status, "League with given name already exists.");
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $responseDecorator->decorateError($status, $result);
         }
 
         return new JsonResponse($data, $status);
@@ -49,6 +48,10 @@ class FootballLeagueController extends Controller
      *
      * @Route("/api/leagues")
      * @Method("POST")
+     * @param Request $request
+     * @param FootballLeagueService $leagueService
+     * @param ResponseErrorDecoratorService $responseDecorator
+     * @return JsonResponse
      */
     public function newLeague(
         Request $request,
@@ -59,19 +62,27 @@ class FootballLeagueController extends Controller
         $body = $request->getContent();
         $data = json_decode($body, true);
 
-        $league = $leagueService->createLeague($data);
+        if (is_null($data) || !isset($data['name'])) {
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $responseDecorator->decorateError(
+                JsonResponse::HTTP_BAD_REQUEST, "Invalid JSON format"
+            );
 
-        if ($league) {
-            $status = 201;
+            return new JsonResponse($data, $status);
+        }
+
+        $result = $leagueService->createLeague($data);
+        if ($result instanceof FootballLeague) {
+            $status = JsonResponse::HTTP_CREATED;
             $data = [
                 'data' => [
-                    'id' => $league->getId(),
-                    'name' => $league->getName()
+                    'id' => $result->getId(),
+                    'name' => $result->getName()
                 ]
             ];
         } else {
-            $status = 400;
-            $data = $responseDecorator->decorateError($status, "League with given name already exists.");
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $responseDecorator->decorateError($status, $result);
         }
 
         return new JsonResponse($data, $status);
