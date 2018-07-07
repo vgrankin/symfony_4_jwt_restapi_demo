@@ -36,9 +36,9 @@ class ApiTest extends BaseTestCase
         $this->assertEquals("This endpoint needs a valid token!", $responseData['error']['message']);
     }
 
-    public function test404____when_Trying_To_Access_Inexisting_Endpoint____Error_Response_Is_Returned()
+    public function test404____when_Trying_To_Access_Nonexistent_Endpoint____Error_Response_Is_Returned()
     {
-        $response = $this->client->get("inexisting-endpoint");
+        $response = $this->client->get("nonexistent-endpoint");
 
         $this->assertEquals(JsonResponse::HTTP_NOT_FOUND, $response->getStatusCode());
 

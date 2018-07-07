@@ -4,28 +4,24 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Tests\BaseTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthControllerTest extends BaseTestCase
 {
     public function testAuthenticate____When_Email_and_Password_is_Provided____Returns_JWT_Token_In_Response()
     {
-        $email = "rest@jwtrestapi.com";
-        $password = "test123";
-
-        $this->createTestUser($email, $password);
-
         $response = $this->client->post("authenticate", [
-            'auth' => [$email, $password]
+            'auth' => [static::TEST_USER_EMAIL, static::TEST_USER_PASSWORD]
         ]);
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertArrayHasKey("data", $responseData);
         $this->assertArrayHasKey("token", $responseData['data']);
     }
 
-    public function testAuthenticate____When_Email_Does_Not_Exist____Returns_No_Such_User_Response()
+    public function testAuthenticate____When_Email_Does_Not_Exist____Returns_No_Such_User_Error_Response()
     {
         $response = $this->client->post("authenticate", [
             'auth' => ["nosuchuser@jwtrestapi.com", "test123"]
@@ -33,12 +29,12 @@ class AuthControllerTest extends BaseTestCase
 
         $responseData = json_decode($response->getBody(), true);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
         $this->assertEquals("No such user", $responseData['error']['message']);
     }
 
@@ -47,20 +43,18 @@ class AuthControllerTest extends BaseTestCase
         $email = "rest@jwtrestapi.com";
         $password = "test123";
 
-        $this->createTestUser($email, $password);
-
         $response = $this->client->post("authenticate", [
             'auth' => [$email, "testXXXXXXX"] // invalid password
         ]);
 
         $responseData = json_decode($response->getBody(), true);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
         $this->assertEquals("Incorrect password", $responseData['error']['message']);
     }
 
@@ -70,12 +64,12 @@ class AuthControllerTest extends BaseTestCase
 
         $responseData = json_decode($response->getBody(), true);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
         $this->assertEquals("Invalid credentials", $responseData['error']['message']);
     }
 }

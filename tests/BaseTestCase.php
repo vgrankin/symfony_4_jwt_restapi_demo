@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class BaseTestCase extends KernelTestCase
 {
+    const TEST_USER_PASSWORD = "test123";
+    const TEST_USER_EMAIL = "rest@jwtrestapi.com";
+
     /**
      * @var Client
      */
@@ -23,7 +26,7 @@ class BaseTestCase extends KernelTestCase
     /**
      * @var User
      */
-    private $testUser;
+    protected $testUser;
 
     public function setUp()
     {
@@ -62,7 +65,7 @@ class BaseTestCase extends KernelTestCase
         $this->em = null; // avoid memory leaks
     }
 
-    protected function createTestUser($email = "rest@jwtrestapi.com", $password = "test123")
+    protected function createTestUser($email = self::TEST_USER_EMAIL, $password = self::TEST_USER_PASSWORD)
     {
         $container = $this->getPrivateContainer();
         $userService = $container

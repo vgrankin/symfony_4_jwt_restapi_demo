@@ -156,7 +156,7 @@ class FootballTeamControllerTest extends BaseTestCase
         $this->assertEquals("Invalid JSON format", $responseData['error']['message']);
     }
 
-    public function testUpdateTeam____when_Updating_Inexisting_Team____Error_Response_Is_Returned()
+    public function testUpdateTeam____when_Updating_Nonexistent_Team____Error_Response_Is_Returned()
     {
         $team = $this->createTestTeam();
 
@@ -175,5 +175,31 @@ class FootballTeamControllerTest extends BaseTestCase
         $this->assertArrayHasKey("message", $responseData['error']);
         $this->assertEquals(JsonResponse::HTTP_NOT_FOUND, $responseData['error']['code']);
         $this->assertEquals("Not Found", $responseData['error']['message']);
+    }
+
+    public function testUpdateTeam____when_Updating_With_Nonexistent_League____Error_Response_Is_Returned()
+    {
+        $team = $this->createTestTeam();
+
+        $data = [
+            "league_id" => 7777777 // will try to assign football team to nonexistent league
+        ];
+
+        $response = $this->client->put("teams/{$team->getId()}", [
+            'body' => json_encode($data),
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getValidToken()
+            ]
+        ]);
+
+        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $responseData = json_decode($response->getBody(), true);
+
+        $responseData = json_decode($response->getBody(), true);
+        $this->assertArrayHasKey("error", $responseData);
+        $this->assertArrayHasKey("code", $responseData['error']);
+        $this->assertArrayHasKey("message", $responseData['error']);
+        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals("Unable to find league to update to", $responseData['error']['message']);
     }
 }
