@@ -20,6 +20,9 @@ class FootballLeagueService
      * Create league by given data
      *
      * @param $data Array which contains information about league
+     *    $data = [
+     *      'name' => (string) League name. Required.
+     *    ]
      * @return FootballLeague|string FootballLeague or error message
      */
     public function createLeague($data)

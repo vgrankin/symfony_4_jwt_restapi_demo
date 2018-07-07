@@ -15,14 +15,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthController
 {
-
     /**
      * Authenticate user by given credentials
      *
      * @Route("/api/authenticate")
-     * @Method("GET")
+     * @Method("POST")
      * @param Request $request
      * @param UserService $userService
+     * @param AuthService $authService
      * @param ResponseErrorDecoratorService $errorDecorator
      * @return JsonResponse
      */
@@ -33,32 +33,34 @@ class AuthController
         ResponseErrorDecoratorService $errorDecorator
     )
     {
-//        $email = $request->getUser();
-//        $plainPassword = $request->getPassword();
-        $email = "rest@jwtrestapi.com";
-        $plainPassword = "test123";
-
-        $result = $userService->getUser($email);
-        if ($result instanceof User) {
-            if (password_verify($plainPassword, $result->getPassword())) {
-                $jwt = $authService->authenticate([
-                    'email' => $result->getEmail()
-                ]);
-                $status = JsonResponse::HTTP_OK;
-                $data = [
-                    'data' => [
-                        'token' => $jwt
-                    ]
-                ];
+        $email = $request->getUser();
+        $plainPassword = $request->getPassword();
+        if (empty($email) || empty($plainPassword)) {
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $errorDecorator->decorateError($status, "Invalid credentials");
+        } else {
+            $result = $userService->getUser($email);
+            if ($result instanceof User) {
+                if (password_verify($plainPassword, $result->getPassword())) {
+                    $jwt = $authService->authenticate([
+                        'email' => $result->getEmail()
+                    ]);
+                    $status = JsonResponse::HTTP_OK;
+                    $data = [
+                        'data' => [
+                            'token' => $jwt
+                        ]
+                    ];
+                } else {
+                    $status = JsonResponse::HTTP_BAD_REQUEST;
+                    $data = $errorDecorator->decorateError($status, "Incorrect password");
+                }
             } else {
                 $status = JsonResponse::HTTP_BAD_REQUEST;
                 $data = $errorDecorator->decorateError($status, $result);
             }
-        } else {
-            $status = JsonResponse::HTTP_BAD_REQUEST;
-            $data = $errorDecorator->decorateError($status, $result);
         }
 
-        return new JsonResponse($data);
+        return new JsonResponse($data, $status);
     }
 }

@@ -39,11 +39,6 @@ class TokenSubscriber implements EventSubscriberInterface
         }
 
         if ($controller[0] instanceof TokenAuthenticatedController) {
-
-            $request = $event->getRequest();
-            $email = $request->getUser();
-            $password = $request->getPassword();
-
             if (!$this->authService->isAuthenticated()) {
                 throw new AccessDeniedHttpException('This endpoint needs a valid token!');
             }

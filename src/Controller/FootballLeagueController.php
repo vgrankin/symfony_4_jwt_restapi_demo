@@ -19,32 +19,6 @@ use App\Controller\TokenAuthenticatedController;
 class FootballLeagueController extends Controller implements TokenAuthenticatedController
 {
     /**
-     * @Route("/api/do")
-     * @Method("GET")
-     */
-    public function doAction__TOREMOVE__(FootballLeagueService $leagueService, ResponseErrorDecoratorService $responseDecorator)
-    {
-        $data = ['name' => 'League 1'];
-        throw new Exception('Nooooooooooooooo!');
-
-        $result = $leagueService->createLeague($data);
-        if ($result instanceof FootballLeague) {
-            $status = JsonResponse::HTTP_CREATED;
-            $data = [
-                'data' => [
-                    'id' => $result->getId(),
-                    'name' => $result->getName()
-                ]
-            ];
-        } else {
-            $status = JsonResponse::HTTP_BAD_REQUEST;
-            $data = $responseDecorator->decorateError($status, $result);
-        }
-
-        return new JsonResponse($data, $status);
-    }
-
-    /**
      * Creates new league by given name (if not exists)
      *
      * @Route("/api/leagues")

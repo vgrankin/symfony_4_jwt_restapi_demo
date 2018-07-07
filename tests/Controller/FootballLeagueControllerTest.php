@@ -14,7 +14,7 @@ class FootballLeagueControllerTest extends BaseTestCase
             "name" => $leagueName
         ];
 
-        $token = "INVALID";
+        $token = $this->getValidToken();
         $response = $this->client->post("leagues", [
             'body' => json_encode($data),
             'headers' => [
@@ -39,13 +39,21 @@ class FootballLeagueControllerTest extends BaseTestCase
             "name" => $leagueName
         ];
 
+        $token = $this->getValidToken();
         $response = $this->client->post("leagues", [
-            'body' => json_encode($data)
+            'body' => json_encode($data),
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
         ]);
 
         // Now try to create new league with same name
+        $token = $this->getValidToken();
         $response = $this->client->post("leagues", [
-            'body' => json_encode($data)
+            'body' => json_encode($data),
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
         ]);
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -66,8 +74,12 @@ class FootballLeagueControllerTest extends BaseTestCase
             "name" => $leagueName
         ];
 
+        $token = $this->getValidToken();
         $response = $this->client->post("leagues", [
-            'body' => json_encode($data)
+            'body' => json_encode($data),
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
         ]);
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -88,8 +100,12 @@ class FootballLeagueControllerTest extends BaseTestCase
             "name" => $leagueName
         ];
 
+        $token = $this->getValidToken();
         $response = $this->client->post("leagues", [
-            'body' => '{"notvalid"}'
+            'body' => '{"notvalid"}',
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
         ]);
 
         $this->assertEquals(400, $response->getStatusCode());
@@ -99,20 +115,6 @@ class FootballLeagueControllerTest extends BaseTestCase
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
         $this->assertEquals(400, $responseData['error']['code']);
-        $this->assertEquals("League name must not be empty!", $responseData['error']['message']);
-    }
-
-    public function test404____when_Trying_To_Access_Inexisting_Endpoint____Error_Response_Is_Returned()
-    {
-        $response = $this->client->get("inexisting-endpoint");
-
-        $this->assertEquals(404, $response->getStatusCode());
-
-        $responseData = json_decode($response->getBody(), true);
-        $this->assertArrayHasKey("error", $responseData);
-        $this->assertArrayHasKey("code", $responseData['error']);
-        $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(404, $responseData['error']['code']);
-        $this->assertEquals("Not Found", $responseData['error']['message']);
+        $this->assertEquals("Invalid JSON format", $responseData['error']['message']);
     }
 }

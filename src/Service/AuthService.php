@@ -4,14 +4,17 @@
 namespace App\Service;
 
 use Firebase\JWT\JWT;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AuthService
 {
     private $jwtSecretKey;
+    private $requestStack;
 
-    public function __construct($jwtSecretKey)
+    public function __construct(RequestStack $requestStack, $jwtSecretKey)
     {
-        $this->jwtSecret = $jwtSecretKey;
+        $this->jwtSecretKey = $jwtSecretKey;
+        $this->requestStack = $requestStack;
     }
 
     const JWT_ALG = 'HS256';
@@ -79,6 +82,8 @@ class AuthService
     {
         $token = $this->_getBearerToken();
         $decoded_array = $this->_validateJWT($token);
+        print_r($decoded_array);
+        die();
         if (!empty($decoded_array)) {
             return $decoded_array;
         } else {
@@ -93,8 +98,8 @@ class AuthService
      */
     private function _getBearerToken()
     {
-        $request = new Request();
-        $authHeader = $request->getHeader('Authorization');
+        $request = $this->requestStack->getCurrentRequest();
+        $authHeader = $request->headers->get('Authorization');
         if (strpos($authHeader, "Bearer ") !== false) {
             $token = explode(" ", $authHeader);
             if (isset($token[1])) {

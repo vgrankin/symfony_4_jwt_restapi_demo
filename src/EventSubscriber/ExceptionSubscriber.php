@@ -44,8 +44,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
      */
     public function processException(GetResponseForExceptionEvent $event)
     {
-        return;
-
         // You get the exception object from the received event
         $exception = $event->getException();
 

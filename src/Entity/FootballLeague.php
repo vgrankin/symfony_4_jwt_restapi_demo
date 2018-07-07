@@ -58,7 +58,7 @@ class FootballLeague
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {

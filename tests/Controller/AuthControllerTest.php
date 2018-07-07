@@ -25,7 +25,24 @@ class AuthControllerTest extends BaseTestCase
         $this->assertArrayHasKey("token", $responseData['data']);
     }
 
-    public function testAuthenticate____When_Password_is_Incorrect____Returns_Invalid_Credentials_Response()
+    public function testAuthenticate____When_Email_Does_Not_Exist____Returns_No_Such_User_Response()
+    {
+        $response = $this->client->post("authenticate", [
+            'auth' => ["nosuchuser@jwtrestapi.com", "test123"]
+        ]);
+
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(400, $response->getStatusCode());
+
+        $this->assertArrayHasKey("error", $responseData);
+        $this->assertArrayHasKey("code", $responseData['error']);
+        $this->assertArrayHasKey("message", $responseData['error']);
+        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals("No such user", $responseData['error']['message']);
+    }
+
+    public function testAuthenticate____When_Password_is_Incorrect____Returns_Invalid_Password_Response()
     {
         $email = "rest@jwtrestapi.com";
         $password = "test123";
@@ -36,6 +53,29 @@ class AuthControllerTest extends BaseTestCase
             'auth' => [$email, "testXXXXXXX"] // invalid password
         ]);
 
+        $responseData = json_decode($response->getBody(), true);
+
         $this->assertEquals(400, $response->getStatusCode());
+
+        $this->assertArrayHasKey("error", $responseData);
+        $this->assertArrayHasKey("code", $responseData['error']);
+        $this->assertArrayHasKey("message", $responseData['error']);
+        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals("Incorrect password", $responseData['error']['message']);
+    }
+
+    public function testAuthenticate____When_Incorrect_Credentials____Returns_Invalid_Credentials_Response()
+    {
+        $response = $this->client->post("authenticate");
+
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(400, $response->getStatusCode());
+
+        $this->assertArrayHasKey("error", $responseData);
+        $this->assertArrayHasKey("code", $responseData['error']);
+        $this->assertArrayHasKey("message", $responseData['error']);
+        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals("Invalid credentials", $responseData['error']['message']);
     }
 }
