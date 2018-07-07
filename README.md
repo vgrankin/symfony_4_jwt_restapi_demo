@@ -11,7 +11,7 @@ Most business logic is moved from controllers to corresponding services,
 which in turn use other services and Doctrine repositories to execute various DB queries.
 
 
-#### Usage/testing:
+### Usage/testing:
 
 You can simply look at and run PHPUnit tests to execute all possible REST API endpoints, but if you want, you can also use tools like POSTMAN to manually access REST API endpoints. Here is how to test all currently available API endpoints:
 
