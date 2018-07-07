@@ -3,10 +3,11 @@
 namespace App\Tests;
 
 use App\Controller\FootballLeagueController;
+use Symfony\Component\HttpFoundation\Response;
 
 class FootballLeagueControllerTest extends BaseTestCase
 {
-    public function testNewLeague____when_Creating_New_League____League_Is_Created_And_Returned_With_Correct_Response_Status()
+    public function testCreateLeague____when_Creating_New_League____League_Is_Created_And_Returned_With_Correct_Response_Status()
     {
         $leagueName = "Test League 1";
 
@@ -22,7 +23,7 @@ class FootballLeagueControllerTest extends BaseTestCase
             ]
         ]);
 
-        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertArrayHasKey("data", $responseData);
@@ -30,7 +31,7 @@ class FootballLeagueControllerTest extends BaseTestCase
         $this->assertEquals($leagueName, $responseData['data']['name']);
     }
 
-    public function testNewLeague____when_Creating_New_League_With_Existing_Name____League_Is_NOT_Created_And_Error_Response_Is_Returned()
+    public function testCreateLeague____when_Creating_New_League_With_Existing_Name____League_Is_NOT_Created_And_Error_Response_Is_Returned()
     {
         // Create new league
         $leagueName = "Test League 1";
@@ -56,17 +57,17 @@ class FootballLeagueControllerTest extends BaseTestCase
             ]
         ]);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
-        $this->assertEquals("League with given name already exists.", $responseData['error']['message']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
+        $this->assertEquals("League with given name already exists", $responseData['error']['message']);
     }
 
-    public function testNewLeague____when_Creating_New_League_With_Blank_Name____League_Is_NOT_Created_And_Error_Response_Is_Returned()
+    public function testCreateLeague____when_Creating_New_League_With_Blank_Name____League_Is_NOT_Created_And_Error_Response_Is_Returned()
     {
         $leagueName = "";
 
@@ -82,17 +83,17 @@ class FootballLeagueControllerTest extends BaseTestCase
             ]
         ]);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
         $this->assertEquals("League name must not be empty!", $responseData['error']['message']);
     }
 
-    public function testNewLeague____when_Creating_New_League_With_Invalid_JSON____League_Is_NOT_Created_And_Error_Response_Is_Returned()
+    public function testCreateLeague____when_Creating_New_League_With_Invalid_JSON____League_Is_NOT_Created_And_Error_Response_Is_Returned()
     {
         $leagueName = "";
 
@@ -108,13 +109,48 @@ class FootballLeagueControllerTest extends BaseTestCase
             ]
         ]);
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("error", $responseData);
         $this->assertArrayHasKey("code", $responseData['error']);
         $this->assertArrayHasKey("message", $responseData['error']);
-        $this->assertEquals(400, $responseData['error']['code']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
         $this->assertEquals("Invalid JSON format", $responseData['error']['message']);
+    }
+
+    public function testDeleteLeague____when_Deleting_Existing_League_Having_No_Teams____League_Is_Deleted_And_Status_204_Is_Returned()
+    {
+        $league = $this->createTestLeague();
+
+        $token = $this->getValidToken();
+        $response = $this->client->delete("leagues/{$league->getId()}", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
+        ]);
+
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+    }
+
+    public function testDeleteLeague____when_Deleting_Existing_League_Having_Team_Assigned____League_Is_NOT_Deleted_And_Error_Is_Returned()
+    {
+        $team = $this->createTestTeam();
+
+        $token = $this->getValidToken();
+        $response = $this->client->delete("leagues/{$team->getLeague()->getId()}", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
+        ]);
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+
+        $responseData = json_decode($response->getBody(), true);
+        $this->assertArrayHasKey("error", $responseData);
+        $this->assertArrayHasKey("code", $responseData['error']);
+        $this->assertArrayHasKey("message", $responseData['error']);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $responseData['error']['code']);
+        $this->assertEquals("Can't delete league. There are teams assigned to it. Remove them first!", $responseData['error']['message']);
     }
 }

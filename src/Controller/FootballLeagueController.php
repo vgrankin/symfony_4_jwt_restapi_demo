@@ -28,7 +28,7 @@ class FootballLeagueController extends Controller implements TokenAuthenticatedC
      * @param ResponseErrorDecoratorService $errorDecorator
      * @return JsonResponse
      */
-    public function newLeague(
+    public function createLeague(
         Request $request,
         FootballLeagueService $leagueService,
         ResponseErrorDecoratorService $errorDecorator
@@ -64,23 +64,6 @@ class FootballLeagueController extends Controller implements TokenAuthenticatedC
     }
 
     /**
-     * @Route("/api/leagues")
-     * @Method("GET")
-     */
-    public function listLeagues()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $leagues = $em->getRepository("App:FootballLeague")
-            ->findAll();
-
-        $data = [
-            'leagues' => $leagues
-        ];
-
-        return new JsonResponse($data);
-    }
-
-    /**
      * @Route("/api/leagues/{id}/teams") "{id}" part of the route will be "magically" converted to property
      *                                of a $league entity, so Symfony will try to find corresponding (by-id) league.
      *                                In case it cannot find the league, 404 will be issued.
@@ -88,7 +71,7 @@ class FootballLeagueController extends Controller implements TokenAuthenticatedC
      * @param FootballLeague $league Symfony will find league entity by {id} and will assign it to $league
      * @return JsonResponse List of football teams for the given league
      */
-    public function getTeams(FootballLeague $league)
+    public function getLeagueTeams(FootballLeague $league)
     {
         $teams = $league->getTeams();
         var_dump($teams);
@@ -98,5 +81,31 @@ class FootballLeagueController extends Controller implements TokenAuthenticatedC
         ];
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * @Route("/api/leagues/{id}")
+     * @Method("DELETE")
+     * @param FootballLeague $league
+     * @param FootballLeagueService $leagueService
+     * @param ResponseErrorDecoratorService $errorDecorator
+     * @return JsonResponse
+     */
+    public function deleteLeague(
+        FootballLeague $league,
+        FootballLeagueService $leagueService,
+        ResponseErrorDecoratorService $errorDecorator
+    )
+    {
+        $result = $leagueService->deleteLeague($league);
+        if ($result === true) {
+            $status = JsonResponse::HTTP_NO_CONTENT;
+            $data = null;
+        } else {
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $errorDecorator->decorateError($status, $result);
+        }
+
+        return new JsonResponse($data, $status);
     }
 }

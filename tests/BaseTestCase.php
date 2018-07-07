@@ -113,6 +113,12 @@ class BaseTestCase extends KernelTestCase
         ]);
     }
 
+    /**
+     * Create valid JWT token for given (if any) or this user
+     *
+     * @param User|null $user
+     * @return string Valid JWT token to use for REST API endpoints authentication
+     */
     protected function getValidToken(User $user = null)
     {
         if (!$user) {
