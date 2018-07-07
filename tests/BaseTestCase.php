@@ -94,6 +94,7 @@ class BaseTestCase extends KernelTestCase
 
     /**
      * @param string $name
+     * @param FootballLeague|null $league
      * @return FootballTeam|string
      */
     protected function createTestTeam($name = "Test Team 1", FootballLeague $league = null)

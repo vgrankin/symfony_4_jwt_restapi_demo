@@ -74,13 +74,28 @@ class FootballLeagueController extends Controller implements TokenAuthenticatedC
     public function getLeagueTeams(FootballLeague $league)
     {
         $teams = $league->getTeams();
-        var_dump($teams);
+        $teamsArr = [];
+        foreach ($teams as $team) {
+            $teamsArr[] = [
+                'id' => $team->getId(),
+                'name' => $team->getName(),
+                'strip' => $team->getStrip(),
+                'league_id' => $league->getId()
+            ];
+        }
 
+        $status = JsonResponse::HTTP_OK;
         $data = [
-            'teams' => $teams
+            'data' => [
+                'league' => [
+                    'id' => $league->getId(),
+                    'name' => $league->getName()
+                ],
+                'teams' => $teamsArr
+            ]
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($data, $status);
     }
 
     /**
