@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class FootballTeamControllerTest extends BaseTestCase
 {
-    public function testNewTeam____when_Creating_New_Team____Team_Is_Created_And_Returned_With_Correct_Response_Status()
+    public function testCreateTeam____when_Creating_New_Team____Team_Is_Created_And_Returned_With_Correct_Response_Status()
     {
         $league = $this->createTestLeague();
 
@@ -201,5 +201,18 @@ class FootballTeamControllerTest extends BaseTestCase
         $this->assertArrayHasKey("message", $responseData['error']);
         $this->assertEquals(400, $responseData['error']['code']);
         $this->assertEquals("Unable to find league to update to", $responseData['error']['message']);
+    }
+
+    public function testDeleteTeam____when_Deleting_Existing_Team____Team_Is_Deleted_And_Status_204_Is_Returned()
+    {
+        $team = $this->createTestTeam();
+        $token = $this->getValidToken();
+        $response = $this->client->delete("teams/{$team->getId()}", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token
+            ]
+        ]);
+
+        $this->assertEquals(JsonResponse::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 }

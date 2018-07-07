@@ -26,7 +26,7 @@ class FootballTeamController extends Controller implements TokenAuthenticatedCon
      * @param ResponseErrorDecoratorService $errorDecorator
      * @return JsonResponse
      */
-    public function newTeam(
+    public function createTeam(
         Request $request,
         FootballLeagueService $leagueService,
         FootballTeamService $teamService,
@@ -98,6 +98,32 @@ class FootballTeamController extends Controller implements TokenAuthenticatedCon
                     'league_id' => $result->getLeague()->getId()
                 ]
             ];
+        } else {
+            $status = JsonResponse::HTTP_BAD_REQUEST;
+            $data = $errorDecorator->decorateError($status, $result);
+        }
+
+        return new JsonResponse($data, $status);
+    }
+
+    /**
+     * @Route("/api/teams/{id}")
+     * @Method("DELETE")
+     * @param FootballTeam $team
+     * @param FootballTeamService $teamService
+     * @param ResponseErrorDecoratorService $errorDecorator
+     * @return JsonResponse
+     */
+    public function deleteTeam(
+        FootballTeam $team,
+        FootballTeamService $teamService,
+        ResponseErrorDecoratorService $errorDecorator
+    )
+    {
+        $result = $teamService->deleteTeam($team);
+        if ($result === true) {
+            $status = JsonResponse::HTTP_NO_CONTENT;
+            $data = null;
         } else {
             $status = JsonResponse::HTTP_BAD_REQUEST;
             $data = $errorDecorator->decorateError($status, $result);

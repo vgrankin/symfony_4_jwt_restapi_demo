@@ -31,6 +31,14 @@ class UserService
         }
     }
 
+    /**
+     * @param $data
+     *    $data = [
+     *      'name' => (string) User name. Required.
+     *      'password' => (string) User (plain) password. Required.
+     *    ]
+     * @return User|string User entity or string in case of error
+     */
     public function createUser($data)
     {
         $email = $data['email'];
@@ -41,9 +49,15 @@ class UserService
         $encoded = password_hash($plainPassword, PASSWORD_DEFAULT);
         $user->setPassword($encoded);
 
-        $this->em->persist($user);
-        $this->em->flush();
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
 
-        return $user;
+            return $user;
+        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $ex) {
+            return "User with given email already exists";
+        } catch (\Exception $ex) {
+            return "Unable to create user";
+        }
     }
 }

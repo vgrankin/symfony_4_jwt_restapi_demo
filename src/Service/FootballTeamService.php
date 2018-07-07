@@ -105,4 +105,20 @@ class FootballTeamService
             return "Unable to update team";
         }
     }
+
+    /**
+     * @param FootballTeam $team
+     * @return bool|string True if team was successfully deleted, error message otherwise
+     */
+    public function deleteTeam(FootballTeam $team)
+    {
+        try {
+            $this->em->remove($team);
+            $this->em->flush();
+        } catch (\Exception $ex) {
+            return "Unable to remove league";
+        }
+
+        return true;
+    }
 }
