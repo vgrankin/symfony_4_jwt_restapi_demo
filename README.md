@@ -71,6 +71,15 @@ See "Usage/testing" section.
             <env name="DATABASE_URL" value="mysql://root:@127.0.0.1/football" /> <!-- this is how my config looks like -->
             * read more here: https://symfony.com/doc/4.0/testing/database.html
 
+## Implementation details:
+- In terms of workflow the following interaction is used: to get the job done for any given request usually something like this is happening: Controller uses Service (which uses Service) which uses Repository which uses Entity. This way we have a good thin controller along with practices like Separation of Concerns, Single responsibility principle etc.
+- App\EventSubscriber is used to process all Symfony-thrown exceptions and turn them into nice REST-API compatible JSON response (instead of HTML error pages shown by default in case of exception like 404 (Not Found) or 500 (Internal Server Error))
+- App\Service\ResponseErrorDecoratorService is a simple helper to prepare error responses and to make this process consistent along the framework. It is used every time error response (such as status 400 or 404) is returned.
+- HTTP status codes and REST API url structure is implemented in a way similar to described here (feel free to reshape it how you wish): https://blog.mwaysolutions.com/2014/06/05/10-best-practices-for-better-restful-api/
+- All application code is in /src folder
+- All tests are located in /tests folder
+- In most cases the following test-case naming convention is used: MethodUnderTest____Scenario____Behavior()
+
 ## Usage/testing:
 
 You can simply look at and run PHPUnit tests (look at tests folder where all test files are located) 
@@ -213,6 +222,6 @@ We can use POSTMAN to access all endpoints:
 ## To improve this REST API you can implement:
 - pagination
 - customize App\EventSubscriber to also support debug mode during development (to debug status 500 etc.) 
-* currently you need to manually go to processException() and just use "return;" on the first line of this method's body to avoid exception "prettyfying"
+ (currently you need to manually go to processException() and just use "return;" on the first line of this method's body to avoid exception "prettyfying")
 - SSL (https connection)
-- there are many strings returned from services in case of various errors (see try/catch cases in FootballTeamService.php for example). It will be better probably to convert these to exceptions.
+- there are many strings returned from services in case of various errors (see try/catch cases in FootballTeamService.php for example). It will be probably better to convert these to exceptions instead.
