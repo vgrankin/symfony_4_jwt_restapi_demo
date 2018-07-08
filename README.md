@@ -33,9 +33,9 @@ See "Usage/testing" section.
 			  because different versions of PHPUnit expect different syntax. Tests for this project 
 			  were built using preinstalled PHPUnit which comes with Symfony (located in bin folder). 
 			  You can run all tests by running this command from project directory: 
-			  ./bin/phpunit (or php bin/phpunit on Windows). 
+			  ./bin/phpunit (php bin/phpunit on Windows). 
 			  * Read more here: https://symfony.com/doc/current/testing.html			 
-- PHP PHP 7.2.6 is used so you will need something similar available on your system (there are many options to install it: Docker/XAMPP/standalone version etc.)
+- PHP 7.2.6 is used so you will need something similar available on your system (there are many options to install it: Docker/XAMPP/standalone version etc.)
 - MariaDB (MySQL) is required (10.1.33-MariaDB was used during development)
 - Guzzle composer package is used to test REST API endpoints
 
@@ -81,6 +81,10 @@ See "Usage/testing" section.
 - In most cases the following test-case naming convention is used: MethodUnderTest____Scenario____Behavior()
 
 ## Usage/testing:
+
+    First of all, start your MySQL server and PHP server. Here is example of how to start local PHP server on Windows 10:
+    C:\Users\admin\PhpProjects\symfony_restapi>php -S 127.0.0.1:8000 -t public
+    * After that http://localhost:8000 should be up and running
 
 You can simply look at and run PHPUnit tests (look at tests folder where all test files are located) 
 to execute all possible REST API endpoints, but if you want, you can also use tools like POSTMAN 
