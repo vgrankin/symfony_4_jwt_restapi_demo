@@ -12,6 +12,18 @@ practices were also kept in mind (thankfully Symfony itself is a good primer of 
 Most business logic is moved from controllers to corresponding services, 
 which in turn use other services and Doctrine repositories to execute various DB queries.
 
+That said, there is always room for improvement, so use it as a starting point and modify
+according to your requirements.
+
+## What this REST API is doing?
+
+This is a simple football teams and leagues managing app, which is implemented as REST API which uses 
+JWT (JSON Web Token) tokens to access various endpoints. 
+You can add football leagues, assign football teams to it, modify some particular football team 
+and remove football teams and leagues. This is a simple project which is used to demonstrate 
+how to create REST API services and secure access to endpoints using JWT tokens. 
+See "Usage/testing" section.
+
 ## Technical details / Requirements:
 - Current project is built using Symfony 4.1 framework
 - It is based on microservice/API symfony project (symfony/skeleton)
@@ -61,9 +73,11 @@ which in turn use other services and Doctrine repositories to execute various DB
 
 ## Usage/testing:
 
-    You can simply look at and run PHPUnit tests to execute all possible REST API endpoints, but if you want, you can also use tools like POSTMAN to manually access REST API endpoints. Here is how to test all currently available API endpoints:
+You can simply look at and run PHPUnit tests (look at tests folder where all test files are located) 
+to execute all possible REST API endpoints, but if you want, you can also use tools like POSTMAN 
+to manually access REST API endpoints. Here is how to test all currently available API endpoints:
     
-    We can use POSTMAN to access all endpoints:
+We can use POSTMAN to access all endpoints:
     
     1) Create API user to work with:
     
@@ -195,4 +209,10 @@ which in turn use other services and Doctrine repositories to execute various DB
     - Add value: Bearer <your_jwt_token_value> (note there is space between "Bearer" and your JWT)	
     
     Response HTTP status should be 204 (endpoint is successfully executed, but there is nothing to return)       
-	
+
+## To improve this REST API you can implement:
+- pagination
+- customize App\EventSubscriber to also support debug mode during development (to debug status 500 etc.) 
+* currently you need to manually go to processException() and just use "return;" on the first line of this method's body to avoid exception "prettyfying"
+- SSL (https connection)
+- there are many strings returned from services in case of various errors (see try/catch cases in FootballTeamService.php for example). It will be better probably to convert these to exceptions.
