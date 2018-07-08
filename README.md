@@ -76,6 +76,7 @@ See "Usage/testing" section.
 - App\EventSubscriber is used to process all Symfony-thrown exceptions and turn them into nice REST-API compatible JSON response (instead of HTML error pages shown by default in case of exception like 404 (Not Found) or 500 (Internal Server Error))
 - App\Service\ResponseErrorDecoratorService is a simple helper to prepare error responses and to make this process consistent along the framework. It is used every time error response (such as status 400 or 404) is returned.
 - HTTP status codes and REST API url structure is implemented in a way similar to described here (feel free to reshape it how you wish): https://blog.mwaysolutions.com/2014/06/05/10-best-practices-for-better-restful-api/
+- In order to make any controller JWT secured (to make every action of it accessible only by authenticated users), it needs to implement TokenAuthenticatedController interface. Read here how this is possible: https://symfony.com/doc/current/event_dispatcher/before_after_filters.html) 
 - All application code is in /src folder
 - All tests are located in /tests folder
 - In most cases the following test-case naming convention is used: MethodUnderTest____Scenario____Behavior()
