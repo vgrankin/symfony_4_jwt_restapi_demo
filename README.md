@@ -45,8 +45,8 @@ See "Usage/testing" section.
     
     - go to project directory and run: composer install
     
-    * at this point make sure MySQL is installed and is available	
-    - in project directory copy .env.dist and create .env file out of it (in same location)
+    * at this point make sure MySQL is installed and is running	
+    - open .env filde in project directory (copy .env.dist and create .env file out of it (in same location) if not exists)
     
     - configure DATATABSE_URL
         - This is example of how my .env config entry looks: DATABASE_URL=mysql://root:@127.0.0.1:3306/football # user "root", no db pass
@@ -73,10 +73,10 @@ See "Usage/testing" section.
 
 ## Implementation details:
 - In terms of workflow the following interaction is used: to get the job done for any given request usually something like this is happening: Controller uses Service (which uses Service) which uses Repository which uses Entity. This way we have a good thin controller along with practices like Separation of Concerns, Single responsibility principle etc.
-- App\EventSubscriber is used to process all Symfony-thrown exceptions and turn them into nice REST-API compatible JSON response (instead of HTML error pages shown by default in case of exception like 404 (Not Found) or 500 (Internal Server Error))
+- App\EventSubscriber\ExceptionSubscriber is used to process all Symfony-thrown exceptions and turn them into nice REST-API compatible JSON response (instead of HTML error pages shown by default in case of exception like 404 (Not Found) or 500 (Internal Server Error))
 - App\Service\ResponseErrorDecoratorService is a simple helper to prepare error responses and to make this process consistent along the framework. It is used every time error response (such as status 400 or 404) is returned.
 - HTTP status codes and REST API url structure is implemented in a way similar to described here (feel free to reshape it how you wish): https://blog.mwaysolutions.com/2014/06/05/10-best-practices-for-better-restful-api/
-- In order to make any controller JWT secured (to make every action of it accessible only by authenticated users), it needs to implement TokenAuthenticatedController interface (Read here how this is possible: https://symfony.com/doc/current/event_dispatcher/before_after_filters.html) 
+- In order to make any controller JWT secured (to make every action of it accessible only to authenticated users), it needs to implement TokenAuthenticatedController interface (Read here how this is possible: https://symfony.com/doc/current/event_dispatcher/before_after_filters.html) 
 - All application code is in /src folder
 - All tests are located in /tests folder
 - In most cases the following test-case naming convention is used: MethodUnderTest____Scenario____Behavior()
@@ -88,7 +88,7 @@ See "Usage/testing" section.
     * After that http://localhost:8000 should be up and running
 
 You can simply look at and run PHPUnit tests (look at tests folder where all test files are located) 
-to execute all possible REST API endpoints, but if you want, you can also use tools like POSTMAN 
+to execute all possible REST API endpoints (To run all tests execute this command from project's root folder: "php bin/phpunit"), but if you want, you can also use tools like POSTMAN 
 to manually access REST API endpoints. Here is how to test all currently available API endpoints:
     
 We can use POSTMAN to access all endpoints:
@@ -99,7 +99,7 @@ We can use POSTMAN to access all endpoints:
     url: http://localhost:8000/users/create
     Body (select raw) and add this line: {"email": "rest@jwtrestapi.com", "password": "test123"}
     
-    you should get the following response:
+    you should get the following response on successful user creation:
     
     {
         "data": {
